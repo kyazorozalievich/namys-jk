@@ -3,7 +3,6 @@ import scss from "./ShopCars.module.scss";
 import { BiSolidWinkSmile } from "react-icons/bi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
 import { ModalContext } from "../../../ui/ModalContext";
 import { useUserProfile } from "../../layout/Profile/useUserProfile";
 
@@ -13,7 +12,6 @@ const ShopCars = () => {
   const { profile } = useUserProfile();
 
   const [photoIndex, setPhotoIndex] = useState(0);
-  const navigate = useNavigate();
 
   const carsData = [
     {
