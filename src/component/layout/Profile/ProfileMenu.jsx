@@ -6,7 +6,6 @@ import { useContext } from "react";
 import { ModalContext } from "../../../ui/ModalContext";
 
 const ProfileMenu = () => {
-  const { openMarketModal } = useContext(ModalContext);
   const { profile, loading } = useUserProfile();
   const { checkMarketAccess } = useContext(ModalContext);
   const navigate = useNavigate();

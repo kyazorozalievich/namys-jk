@@ -5,7 +5,7 @@ const Create = () => {
   return (
     <section>
       <div className="container">
-        <div className="nav"></div>
+        <div className={scss.nav}></div>
       </div>
     </section>
   );

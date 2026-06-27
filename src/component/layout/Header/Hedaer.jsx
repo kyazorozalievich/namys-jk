@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import scss from "./Header.module.scss";
 import logo from "../../../data/images/fullogo.png";
 
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import {useLocation, useNavigate } from "react-router-dom";
 
 import { MdAdminPanelSettings } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
@@ -21,23 +21,23 @@ import { useUserProfile } from "../Profile/useUserProfile";
 const Header = () => {
   const location = useLocation();
   const { checkMarketAccess } = useContext(ModalContext);
-  const { profile } = useUserProfile();
   const navigate = useNavigate();
+  const { profile } = useUserProfile();
 
   const { user } = useContext(AuthContext);
   console.log("HEADER:", user);
 
   const [openProfile, setOpenProfile] = useState(false);
 
-  const loginWithGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
+  // const loginWithGoogle = async () => {
+  //   try {
+  //     const result = await signInWithPopup(auth, provider);
 
-      // alert(`Добро пожаловать, ${result.user.displayName}!`);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     // alert(`Добро пожаловать, ${result.user.displayName}!`);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const logout = async () => {
     await signOut(auth);
@@ -102,11 +102,13 @@ const Header = () => {
 
                 {openProfile && (
                   <div className={scss.dropdown}>
-                    <NavLink to="/profile/account">Мой профиль</NavLink>
+                    <span onClick={() => naviagete("/profile/account")}>
+                      Мой профиль
+                    </span>
 
-                    <a onClick={() => checkMarketAccess(profile)}>
+                    <span onClick={() => checkMarketAccess(profile)}>
                       Разместить машину
-                    </a>
+                    </span>
 
                     <button onClick={logout}>Выйти</button>
                   </div>

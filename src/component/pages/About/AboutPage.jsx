@@ -2,7 +2,6 @@ import React from "react";
 import AboutMain from "./AboutMain";
 import LiderAbout from "./LiderAbout";
 import MembersAbout from "./MembersAbout";
-import UslugiAbout from "../Main/Uslugi";
 import HistoryAbout from "./HistoryAbout";
 import GalleryAbout from "./GalleryAbout";
 

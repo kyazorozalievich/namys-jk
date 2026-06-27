@@ -1,5 +1,5 @@
 import React from 'react';
-import scss from './dt.module.scss'
+// import scss from './dt.module.scss'
 
 const DetailingPage = () => {
     return (
