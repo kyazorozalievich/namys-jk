@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import scss from "./Header.module.scss";
 import logo from "../../../data/images/fullogo.png";
 
-import {useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { MdAdminPanelSettings } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
@@ -29,15 +29,13 @@ const Header = () => {
 
   const [openProfile, setOpenProfile] = useState(false);
 
-  // const loginWithGoogle = async () => {
-  //   try {
-  //     const result = await signInWithPopup(auth, provider);
-
-  //     // alert(`Добро пожаловать, ${result.user.displayName}!`);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  const loginWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("Ошибка авторизации:", error);
+    }
+  };
 
   const logout = async () => {
     await signOut(auth);
@@ -102,7 +100,7 @@ const Header = () => {
 
                 {openProfile && (
                   <div className={scss.dropdown}>
-                    <span onClick={() => naviagete("/profile/account")}>
+                    <span onClick={() => navigate("/profile/account")}>
                       Мой профиль
                     </span>
 
