@@ -1,0 +1,187 @@
+.profilePage {
+  min-height: 100vh;
+  padding: 120px 0 60px;
+  background: #f7f7f7;
+}
+
+.errorAuth {
+  padding-top: 120px;
+  text-align: center;
+}
+
+.card {
+  max-width: 850px;
+  margin: auto;
+  background: white;
+  border-radius: 20px;
+  padding: 35px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+
+  img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #d1a959;
+  }
+}
+
+.userInfo {
+  h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+}
+
+.vipBadge,
+.freeBadge {
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.vipBadge {
+  background: #d1a959;
+  color: white;
+}
+
+.freeBadge {
+  background: #ececec;
+}
+
+.stats {
+  margin-top: 35px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.item {
+  background: #fafafa;
+  border: 1px solid #ececec;
+  border-radius: 15px;
+  padding: 20px;
+
+  span {
+    color: gray;
+    font-size: 14px;
+  }
+
+  h3 {
+    margin-top: 10px;
+    font-size: 21px;
+  }
+}
+
+.progress {
+  margin-top: 30px;
+  height: 12px;
+  background: #ececec;
+  border-radius: 30px;
+  overflow: hidden;
+
+  div {
+    height: 100%;
+    background: #d1a959;
+    transition: 0.4s;
+  }
+}
+
+.bottomText {
+  margin-top: 15px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.actions {
+  margin-top: 35px;
+  display: flex;
+  gap: 20px;
+
+  button {
+    flex: 1;
+    height: 55px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+}
+
+.myAds {
+  background: white;
+  border: 2px solid #d1a959 !important;
+
+  &:hover {
+    background: #d1a959;
+    color: white;
+  }
+}
+
+.addCar {
+  background: #d1a959;
+  color: white;
+
+  &:hover {
+    background: #b68a3d;
+  }
+}
+
+.marketInfo {
+  margin-top: 35px;
+  padding: 25px;
+  border-radius: 15px;
+  background: #fafafa;
+  border: 1px solid #ececec;
+
+  h2 {
+    margin-bottom: 15px;
+    color: #d1a959;
+  }
+
+  p {
+    margin: 10px 0;
+    line-height: 1.6;
+  }
+}
+
+.telegram {
+  margin-top: 20px;
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  background: #229ed9;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 700px) {
+  .top {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}

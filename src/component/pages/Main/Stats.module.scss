@@ -1,0 +1,39 @@
+.statsSec {
+    .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 50px;
+        .block {
+            display: flex;
+            align-items: start;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 20px;
+            gap: 10px;
+            width: 360px;
+            height: 130px;
+            border: 1px solid rgba(128, 128, 128, 0.338);
+            border-radius: 10px;
+            transition: 0.5s;
+            cursor: pointer;
+            &:hover {
+                transform: translateY(-10px);
+                border: 1px solid black;
+                box-shadow: 5px 5px 5px rgba(128, 128, 128, 0.377);
+            }
+            span {
+                font-size: 25px;
+                color: #b68a3d;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            h6 {
+                font-size: 13px;
+                color: rgb(110, 109, 109);
+                font-weight: 500;
+            }
+        }
+    }
+}

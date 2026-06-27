@@ -1,0 +1,58 @@
+.historySec {
+  margin-block: 100px;
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    h5 {
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #b68a3d;
+    }
+    h2 {
+      font-size: 50px;
+      letter-spacing: 5px;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+    .historyTitles {
+      display: flex;
+      align-items: start;
+      flex-direction: column;
+      margin-top: 30px;
+      gap: 40px;
+      .texts {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        span {
+          padding-inline: 15px;
+          padding-block: 5px;
+          border: 2px solid #b68a3d;
+          border-radius: 50px;
+          letter-spacing: 3px;
+          font-family: monospace;
+          font-size: 20px;
+          color: #b68a3d;
+        }
+        .name {
+          display: flex;
+          align-items: start;
+          flex-direction: column;
+          gap: 10px;
+          h3 {
+            font-size: 25px;
+          }
+          p {
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+}

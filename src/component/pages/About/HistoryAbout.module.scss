@@ -1,0 +1,21 @@
+.historySec {
+    margin-block: 100px;
+  .nav {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    h1 {
+      font-family: sans-serif;
+      font-size: 40px;
+    }
+    p {
+        text-align: center;
+        width: 75%;
+        line-height: 25px;
+        span {
+            color: #b68a3d;
+        }
+    }
+  }
+}

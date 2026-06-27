@@ -1,0 +1,37 @@
+.mainSec {
+  min-height: 70vh;
+  background: url("../../../data/images/about/mainImg.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  .bg {
+    padding-top: 100px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.185);
+    backdrop-filter: blur(15px);
+    .nav {
+      height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+      h1 {
+        font-size: 80px;
+        letter-spacing: 5px;
+        font-family:
+          "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+          "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+        span {
+          color: #b68a3d;
+        }
+      }
+      h6 {
+        text-align: center;
+        font-size: 20px;
+        line-height: 30px;
+        text-shadow: 0px 1px 0px rgba(128, 128, 128, 0.571);
+        font-weight: 500;
+      }
+    }
+  }
+}
