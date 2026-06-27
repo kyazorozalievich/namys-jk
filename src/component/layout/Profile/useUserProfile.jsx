@@ -47,7 +47,7 @@ export const useUserProfile = () => {
     );
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, authLoading]);
 
   return {
     profile,
