@@ -1,19 +1,33 @@
 .mainSec {
   min-height: 100vh;
+  width: 100%;
+  display: flex; // Делаем секцию флекс-контейнером
+  flex-direction: column;
+
+  // Переносим картинку СЮДА, чтобы .bg её гарантированно перекрывал по всей площади
   background: url("../../../data/images/main/mainbg.png");
   background-position: center;
   background-repeat: no-repeat;
+  background-size: cover; // Обязательно добавляем cover, чтобы картинка не дублировалась и заполняла экран
+
   .bg {
     padding-top: 100px;
+    padding-bottom: 40px; // Добавим нижний паддинг, чтобы на маленьких экранах текст не прилипал к низу
     width: 100%;
-    height: 100%;
+    flex-grow: 1; // Растягивает блок на ВСЮ доступную высоту родителя .mainSec
+    display: flex;
+    align-items: center; // Центрирует контент по вертикали, если экран слишком высокий
+
     background: rgba(255, 255, 255, 0.082);
     backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px); // Сафари-совместимость
+
     .nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: relative;
+      width: 100%; // Гарантируем ширину внутри контейнера
 
       &::after {
         content: "";
@@ -29,12 +43,16 @@
         border-radius: 50%;
         z-index: 1;
       }
+
       .text {
         display: flex;
         align-items: start;
         flex-direction: column;
         gap: 20px;
         animation: fadeLeft 1s ease;
+        position: relative;
+        z-index: 2; // Чтобы текст всегда был выше золотого свечения back-градиента
+
         h5 {
           padding-block: 5px;
           padding-inline: 15px;
@@ -42,6 +60,7 @@
           border: 1px solid black;
           font-size: 15px;
         }
+
         h1 {
           font-size: 70px;
           line-height: 90px;
@@ -50,40 +69,47 @@
           font-family:
             "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
             "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+
           span {
             color: #b68a3d;
             text-shadow: 2px 2px 2px black;
           }
         }
+
         h6 {
           font-size: 15px;
           line-height: 25px;
           font-weight: 500;
         }
+
         .buttons {
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 20px;
+
           button {
             padding-block: 10px;
             padding-inline: 20px;
             font-weight: 600;
             border-radius: 5px;
+            cursor: pointer; // Добавим курсор для кнопок
           }
+
           .btn1 {
             background: linear-gradient(135deg, #d1a959, #b68a3d);
             transition: 0.5s ease-in-out;
-
-            &:hover {
-              transform: translateY(-3px);
-            }
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+
+            &:hover {
+              transform: translateY(-3px);
+            }
           }
+
           .btn2 {
             border: 1px solid black;
             background: transparent;
@@ -96,12 +122,15 @@
           }
         }
       }
+
       img {
         animation: rotateY 5s linear infinite;
         transform-style: preserve-3d;
         position: relative;
         z-index: 2;
         filter: drop-shadow(0 0 25px rgba(182, 138, 61, 0.5));
+        max-width: 45%; // Ограничим картинку на случай узких экранов
+        height: auto;
       }
     }
   }
@@ -111,7 +140,6 @@
   from {
     transform: rotateY(0deg);
   }
-
   to {
     transform: rotateY(360deg);
   }
