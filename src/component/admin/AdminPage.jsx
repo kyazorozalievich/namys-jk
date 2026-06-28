@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { db } from "../../firebase/FireBase";
 import {
   collection,
-  query,
   onSnapshot,
   doc,
   updateDoc,
