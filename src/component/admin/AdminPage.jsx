@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../../firebase/FireBase"; // Твой конфиг Firebase
+import { db } from "../../firebase/FireBase";
 import {
   collection,
   query,
-  orderBy,
   onSnapshot,
   doc,
   updateDoc,
@@ -16,17 +15,12 @@ const AdminPage = () => {
   const [users, setUsers] = useState([]);
   const [loadingCars, setLoadingCars] = useState(true);
   const [loadingUsers, setLoadingUsers] = useState(true);
-
-  // Главные вкладки админки: "ads" (Объявления) или "users" (Пользователи)
   const [activeSection, setActiveSection] = useState("ads");
-
-  // Фильтр внутри объявлений ("all", "pending", "verified")
   const [carFilter, setCarFilter] = useState("all");
 
-  // 1. Подписка на машины (в реальном времени)
+  // 1. Подписка на машины
   useEffect(() => {
-    const qCars = query(collection(db, "cars"), orderBy("createdAt", "desc"));
-    const unsubscribeCars = onSnapshot(qCars, (snapshot) => {
+    const unsubscribeCars = onSnapshot(collection(db, "cars"), (snapshot) => {
       const carsData = [];
       snapshot.forEach((doc) => {
         carsData.push({ id: doc.id, ...doc.data() });
@@ -34,14 +28,12 @@ const AdminPage = () => {
       setCars(carsData);
       setLoadingCars(false);
     });
-
     return () => unsubscribeCars();
   }, []);
 
-  // 2. Подписка на пользователей (в реальном времени)
+  // 2. Подписка на пользователей
   useEffect(() => {
-    const qUsers = query(collection(db, "users"));
-    const unsubscribeUsers = onSnapshot(qUsers, (snapshot) => {
+    const unsubscribeUsers = onSnapshot(collection(db, "users"), (snapshot) => {
       const usersData = [];
       snapshot.forEach((doc) => {
         usersData.push({ id: doc.id, ...doc.data() });
@@ -49,94 +41,85 @@ const AdminPage = () => {
       setUsers(usersData);
       setLoadingUsers(false);
     });
-
     return () => unsubscribeUsers();
   }, []);
 
-  /* ================= ФУНКЦИИ ДЛЯ ОБЪЯВЛЕНИЙ ================= */
-
+  /* ================= УПРАВЛЕНИЕ ОБЪЯВЛЕНИЯМИ ================= */
   const handleVerify = async (carId, currentStatus) => {
     try {
-      const carRef = doc(db, "cars", carId);
-      await updateDoc(carRef, { verified: !currentStatus });
-    } catch (error) {
-      console.error("Ошибка при обновлении статуса верификации:", error);
+      await updateDoc(doc(db, "cars", carId), { verified: !currentStatus });
+    } catch (e) {
+      console.error(e);
     }
   };
 
   const handleToggleVip = async (carId, currentVipStatus) => {
     try {
-      const carRef = doc(db, "cars", carId);
-      await updateDoc(carRef, { isVip: !currentVipStatus });
-    } catch (error) {
-      console.error("Ошибка при обновлении VIP-статуса машины:", error);
+      await updateDoc(doc(db, "cars", carId), { isVip: !currentVipStatus });
+    } catch (e) {
+      console.error(e);
     }
   };
 
   const handleDeleteCar = async (carId) => {
-    if (
-      window.confirm(
-        "Вы уверены, что хотите безвозвратно удалить это объявление?",
-      )
-    ) {
+    if (window.confirm("Удалить объявление?")) {
       try {
         await deleteDoc(doc(db, "cars", carId));
-      } catch (error) {
-        console.error("Ошибка при удалении машины:", error);
+      } catch (e) {
+        console.error(e);
       }
     }
   };
 
-  /* ================= ФУНКЦИИ ДЛЯ ПОЛЬЗОВАТЕЛЕЙ ================= */
+  /* ================= УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ (ТВОИ КЛЮЧИ) ================= */
 
-  // Изменение роли пользователя (Участник <-> Админ)
+  // Смена Роли (admin / member)
   const handleUpdateRole = async (userId, currentRole) => {
     const newRole = currentRole === "admin" ? "member" : "admin";
-    if (
-      window.confirm(
-        `Изменить роль пользователя на ${newRole === "admin" ? "Администратор" : "Участник"}?`,
-      )
-    ) {
+    if (window.confirm(`Поменять роль на ${newRole}?`)) {
       try {
-        const userRef = doc(db, "users", userId);
-        await updateDoc(userRef, { role: newRole });
-      } catch (error) {
-        console.error("Ошибка при изменении роли:", error);
+        await updateDoc(doc(db, "users", userId), { role: newRole });
+      } catch (e) {
+        console.error(e);
       }
     }
   };
 
-  // Переключение тарифа: Обычный <-> VIP Аккаунт
-  const handleToggleUserVip = async (userId, currentVipStatus) => {
+  // Смена Тарифа (plan: "free" <-> "vip") + автоматическое изменение лимита adsLimit
+  const handleToggleUserPlan = async (userId, currentPlan) => {
+    const newPlan = currentPlan === "vip" ? "free" : "vip";
+    const newLimit = newPlan === "vip" ? 20 : 10; // Если VIP — даем 20 лимит, если обычный — 3
+
     try {
-      const userRef = doc(db, "users", userId);
-      await updateDoc(userRef, { isVip: !currentVipStatus });
-    } catch (error) {
-      console.error("Ошибка при изменении VIP-тарифного плана:", error);
+      await updateDoc(doc(db, "users", userId), {
+        plan: newPlan,
+        adsLimit: newLimit,
+      });
+    } catch (e) {
+      console.error("Ошибка смены тарифа:", e);
     }
   };
 
-  // Изменение статуса аккаунта через выпадающий список (Active, Pending, Restricted)
-  const handleUpdateUserStatus = async (userId, newStatus) => {
+  // Смена Статуса Активации (marketStatus: "active", "pending", "restricted")
+  const handleUpdateMarketStatus = async (userId, newStatus) => {
     try {
-      const userRef = doc(db, "users", userId);
-      await updateDoc(userRef, { status: newStatus });
-    } catch (error) {
-      console.error("Ошибка при обновлении статуса пользователя:", error);
+      await updateDoc(doc(db, "users", userId), { marketStatus: newStatus });
+    } catch (e) {
+      console.error("Ошибка изменения статуса:", e);
     }
   };
 
-  // Блокировка / Разблокировка пользователя (Бан мошенников)
+  // Бан пользователя
   const handleToggleBan = async (userId, currentBanStatus) => {
-    const actionText = currentBanStatus ? "разблокировать" : "ЗАБЛОКИРОВАТЬ";
     if (
-      window.confirm(`Вы уверены, что хотите ${actionText} этого пользователя?`)
+      window.confirm(currentBanStatus ? "Разблокировать?" : "ЗАБЛОКИРОВАТЬ?")
     ) {
       try {
-        const userRef = doc(db, "users", userId);
-        await updateDoc(userRef, { isBanned: !currentBanStatus });
-      } catch (error) {
-        console.error("Ошибка при изменении статуса блокировки:", error);
+        await updateDoc(doc(db, "users", userId), {
+          isBanned: !currentBanStatus,
+        });
+      } catch (e) {
+        console.error(e);
       }
     }
   };
@@ -147,18 +130,13 @@ const AdminPage = () => {
     return true;
   });
 
-  if (loadingCars || loadingUsers) {
-    return (
-      <div className={scss.loader}>
-        Загрузка расширенной панели управления...
-      </div>
-    );
-  }
+  if (loadingCars || loadingUsers)
+    return <div className={scss.loader}>Загрузка...</div>;
 
   return (
     <div className={scss.adminPage}>
       <div className={scss.adminContainer}>
-        {/* Глобальные переключатели разделов админки */}
+        {/* Вкладки */}
         <div className={scss.sectionTabs}>
           <button
             className={activeSection === "ads" ? scss.activeSectionTab : ""}
@@ -176,7 +154,7 @@ const AdminPage = () => {
 
         <hr className={scss.separator} />
 
-        {/* РАЗДЕЛ 1: УПРАВЛЕНИЕ ОБЪЯВЛЕНИЯМИ */}
+        {/* ТАБЛИЦА ОБЪЯВЛЕНИЙ */}
         {activeSection === "ads" && (
           <>
             <div className={scss.filterTabs}>
@@ -184,19 +162,19 @@ const AdminPage = () => {
                 className={carFilter === "all" ? scss.activeTab : ""}
                 onClick={() => setCarFilter("all")}
               >
-                Все ({cars.length})
+                Все
               </button>
               <button
                 className={carFilter === "pending" ? scss.activeTab : ""}
                 onClick={() => setCarFilter("pending")}
               >
-                Ожидают модерации ({cars.filter((c) => !c.verified).length})
+                Ожидают
               </button>
               <button
                 className={carFilter === "verified" ? scss.activeTab : ""}
                 onClick={() => setCarFilter("verified")}
               >
-                Проверенные ({cars.filter((c) => c.verified).length})
+                Проверенные
               </button>
             </div>
 
@@ -205,9 +183,8 @@ const AdminPage = () => {
                 <thead>
                   <tr>
                     <th>Фото</th>
-                    <th>Название / Цена</th>
+                    <th>Название</th>
                     <th>Продавец</th>
-                    <th>Характеристики</th>
                     <th>Статус</th>
                     <th>Действия</th>
                   </tr>
@@ -218,54 +195,25 @@ const AdminPage = () => {
                       <td>
                         <img
                           src={car.images?.[0] || "placeholder.png"}
-                          alt={car.title}
                           className={scss.carThumb}
+                          alt=""
                         />
                       </td>
                       <td>
-                        <div className={scss.carInfo}>
-                          <strong>
-                            {car.brand} {car.title}
-                          </strong>
-                          <span>
-                            {car.price?.toLocaleString()} {car.currency}
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className={scss.authorInfo}>
-                          <span>{car.authorEmail}</span>
-                          <span
-                            className={`${scss.roleBadge} ${scss[car.authorRole]}`}
-                          >
-                            {car.authorRole === "admin" ? "Админ" : "Участник"}
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className={scss.specs}>
-                          <span>🚀 {car.power} HP</span>
-                          {car.isVip && (
-                            <span className={scss.vipCrown}>👑 VIP Авто</span>
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        <span
-                          className={`${scss.statusBadge} ${car.verified ? scss.verified : scss.pending}`}
-                        >
-                          {car.verified ? "Проверено" : "Ожидает"}
+                        {car.brand} {car.title}
+                        <br />
+                        <span>
+                          {car.price?.toLocaleString()} {car.currency}
                         </span>
                       </td>
+                      <td>{car.authorEmail}</td>
+                      <td>{car.verified ? "🟢 Проверено" : "🟡 Ожидает"}</td>
                       <td>
                         <div className={scss.actions}>
                           <button
                             onClick={() => handleVerify(car.id, car.verified)}
-                            className={
-                              car.verified ? scss.btnUnverify : scss.btnVerify
-                            }
                           >
-                            {car.verified ? "Снять проверку" : "Одобрить"}
+                            {car.verified ? "Снять" : "Одобрить"}
                           </button>
                           <button
                             onClick={() => handleToggleVip(car.id, car.isVip)}
@@ -285,27 +233,23 @@ const AdminPage = () => {
                   ))}
                 </tbody>
               </table>
-              {filteredCars.length === 0 && (
-                <div className={scss.emptyState}>
-                  Нет объявлений в этой категории
-                </div>
-              )}
             </div>
           </>
         )}
 
-        {/* РАЗДЕЛ 2: УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ (ТАРИФЫ, СТАТУСЫ, РОЛИ, БАНЫ) */}
+        {/* ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ */}
         {activeSection === "users" && (
           <div className={scss.tableWrapper}>
             <table className={scss.adminTable}>
               <thead>
                 <tr>
-                  <th>Email пользователя</th>
-                  <th>Имя / Никнейм</th>
-                  <th>Роль доступа</th>
-                  <th>Тарифный план</th>
-                  <th>Статус активности</th>
-                  <th>Управление / Модерация</th>
+                  <th>Аватар</th>
+                  <th>Email / Имя</th>
+                  <th>Роль</th>
+                  <th>Тариф (План)</th>
+                  <th>Лимит объявлений</th>
+                  <th>Доступ к рынку</th>
+                  <th>Модерация</th>
                 </tr>
               </thead>
               <tbody>
@@ -315,40 +259,58 @@ const AdminPage = () => {
                     className={user.isBanned ? scss.bannedRow : ""}
                   >
                     <td>
+                      <img
+                        src={user.photo || "placeholder.png"}
+                        className={scss.avatarThumb}
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "50%",
+                        }}
+                        alt=""
+                      />
+                    </td>
+                    <td>
                       <strong
                         style={{ color: user.isBanned ? "#e04554" : "inherit" }}
                       >
-                        {user.email} {user.isBanned && " (ЗАБАНЕН)"}
+                        {user.email}
                       </strong>
+                      <br />
+                      <span>{user.name || "Без имени"}</span>
                     </td>
-                    <td>{user.name || user.displayName || "Не указано"}</td>
                     <td>
-                      <span
-                        className={`${scss.roleBadge} ${scss[user.role || "member"]}`}
-                      >
-                        {user.role === "admin" ? "Администратор" : "Участник"}
-                      </span>
+                      {user.role === "admin" ? "👑 Админ" : "👤 Участник"}
                     </td>
                     <td>
                       <button
-                        onClick={() => handleToggleUserVip(user.id, user.isVip)}
-                        className={`${scss.tariffBadge} ${user.isVip ? scss.vipTariff : scss.baseTariff}`}
+                        onClick={() => handleToggleUserPlan(user.id, user.plan)}
+                        className={`${scss.tariffBadge} ${user.plan === "vip" ? scss.vipTariff : scss.baseTariff}`}
                       >
-                        {user.isVip ? "👑 ТАРИФ: VIP" : "🏷️ ТАРИФ: Базовый"}
+                        {user.plan === "vip" ? "👑 VIP План" : "🏷️ Базовый"}
                       </button>
                     </td>
                     <td>
+                      <span style={{ fontWeight: "600" }}>
+                        {user.adsUsed || 0} / {user.adsLimit || 0}
+                      </span>
+                    </td>
+                    <td>
                       <select
-                        value={user.status || "active"}
+                        value={user.marketStatus || "pending"}
                         onChange={(e) =>
-                          handleUpdateUserStatus(user.id, e.target.value)
+                          handleUpdateMarketStatus(user.id, e.target.value)
                         }
                         className={scss.statusSelect}
                         disabled={user.isBanned}
                       >
-                        <option value="active">🟢 Активен</option>
-                        <option value="pending">🟡 На проверке</option>
-                        <option value="restricted">🔴 Ограничен</option>
+                        <option value="active">🟢 Активен (Оплачено)</option>
+                        <option value="pending">
+                          🟡 Неактивен (Ждет оплаты)
+                        </option>
+                        <option value="restricted">
+                          🔴 Ограничен (Бан на рынке)
+                        </option>
                       </select>
                     </td>
                     <td>
@@ -357,9 +319,7 @@ const AdminPage = () => {
                           onClick={() => handleUpdateRole(user.id, user.role)}
                           className={scss.btnRoleToggle}
                         >
-                          {user.role === "admin"
-                            ? "Сделать участником"
-                            : "Дать права админа"}
+                          Роль
                         </button>
                         <button
                           onClick={() =>
@@ -369,7 +329,7 @@ const AdminPage = () => {
                             user.isBanned ? scss.btnUnban : scss.btnBan
                           }
                         >
-                          {user.isBanned ? "Разблокировать" : "Забанить"}
+                          {user.isBanned ? "Разбан" : "Бан"}
                         </button>
                       </div>
                     </td>
@@ -377,9 +337,6 @@ const AdminPage = () => {
                 ))}
               </tbody>
             </table>
-            {users.length === 0 && (
-              <div className={scss.emptyState}>Список пользователей пуст</div>
-            )}
           </div>
         )}
       </div>

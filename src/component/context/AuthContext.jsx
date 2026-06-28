@@ -10,37 +10,33 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Код внутри useEffect в AuthContext
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
-      console.log("FIREBASE USER:", currentUser);
-
       if (currentUser) {
         try {
-          // Ссылка на документ пользователя в коллекции "users" по его уникальному uid
           const userRef = doc(db, "users", currentUser.uid);
           const userSnap = await getDoc(userRef);
 
-          // Если документа в Firestore нет, создаем его автоматически
           if (!userSnap.exists()) {
-            console.log("Новый пользователь! Создаем документ в Firestore...");
+            console.log("Создаем пользователя с правильной структурой...");
             await setDoc(userRef, {
               uid: currentUser.uid,
               email: currentUser.email,
               name: currentUser.displayName || "Участник клана",
-              photoURL: currentUser.photoURL || "",
-              role: "member", // По умолчанию обычный участник
-              isVip: false, // По умолчанию не VIP
-              isBanned: false, // По умолчанию не забанен
+              photo: currentUser.photoURL || "", // Твой ключ photo
+              role: "member",
+              marketStatus: "pending", // 🟢 СРАЗУ НЕАКТИВЕН (На проверке/Ждет оплаты)
+              plan: "free", // 🟢 Стартовый тариф обычный
+              adsLimit: 3, // 🟢 Сколько объявлений можно (например, 3)
+              adsUsed: 0, // 🟢 Уже использовано
+              isBanned: false, // Флаг для бана мошенников
               createdAt: new Date(),
             });
           }
         } catch (error) {
-          console.error(
-            "Ошибка при проверке/создании пользователя в Firestore:",
-            error,
-          );
+          console.error("Ошибка Firestore:", error);
         }
       }
-
       setUser(currentUser);
       setLoading(false);
     });
