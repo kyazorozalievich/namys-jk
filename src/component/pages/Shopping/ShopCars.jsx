@@ -118,9 +118,9 @@ const ShopCars = () => {
     }
   };
 
-  // Фильтрация и сортировка
-  const filteredCars = cars
+ const filteredCars = cars
     .filter((car) => {
+      // 1. Фильтрация по типу кузова
       if (
         filterType !== "Все типы" &&
         filterType !== "Тип" &&
@@ -128,32 +128,51 @@ const ShopCars = () => {
       ) {
         return false;
       }
+
+      // 2. ИСПРАВЛЕННАЯ ЛОГИКА ПОД ТВОЮ ЗАДАЧУ:
+      if (filterVerified === "Все пользователи") {
+        // Если машина НЕ верифицирована И её автор НЕ админ — значит, её владелец забанен.
+        // Скрываем такие машины с рынка. Все остальные (активные) — показываем!
+        if (!car.verified && car.authorRole !== "admin") {
+          return false;
+        }
+      }
+
+      // Если в селекторе принудительно выбрано "Проверенные"
       if (filterVerified === "Проверенные" && !car.verified) {
         return false;
       }
+
+      // Если в селекторе принудительно выбрано "Непроверенные" (забаненные/ожидающие)
       if (filterVerified === "Непроверенные" && car.verified) {
         return false;
       }
+
       return true;
     })
     .sort((a, b) => {
+      // Сортировка по роли (Админы всегда выше)
       const aAdmin = a.authorRole === "admin" ? 1 : 0;
       const bAdmin = b.authorRole === "admin" ? 1 : 0;
       if (aAdmin !== bAdmin) return bAdmin - aAdmin;
 
+      // Сортировка по верификации
       const aVerified = a.verified && a.authorRole !== "admin" ? 1 : 0;
       const bVerified = b.verified && b.authorRole !== "admin" ? 1 : 0;
       if (aVerified !== bVerified) return bVerified - aVerified;
 
+      // Сортировка по VIP-статусу
       const aVip = a.isVip ? 1 : 0;
       const bVip = b.isVip ? 1 : 0;
       if (aVip !== bVip) return bVip - aVip;
 
+      // Кастомные сортировки пользователя
       if (currentSort === "Дорогие") return b.price - a.price;
       if (currentSort === "Дешевые") return a.price - b.price;
       if (currentSort === "Мощные") return (b.power || 0) - (a.power || 0);
       if (currentSort === "Слабые") return (a.power || 0) - (b.power || 0);
 
+      // Сортировка по дате
       const aTime = a.createdAt?.seconds || 0;
       const bTime = b.createdAt?.seconds || 0;
       return bTime - aTime;

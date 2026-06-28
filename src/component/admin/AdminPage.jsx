@@ -142,7 +142,7 @@ const AdminPage = () => {
     }
   };
 
-  // Бан пользователя + сброс VIP + отключение его машин с рынка
+  // Бан / Разбан пользователя + автоматическое скрытие/возврат машин на рынок
   const handleToggleBan = async (user) => {
     const userId = user.id;
     const userEmail = user.email;
@@ -153,7 +153,7 @@ const AdminPage = () => {
       window.confirm(
         willBan
           ? "ЗАБЛОКИРОВАТЬ пользователя, сбросить его тариф и снять с рынка ВСЕ его машины?"
-          : "Разблокировать пользователя?",
+          : "Разблокировать пользователя и вернуть его машины на рынок?",
       )
     ) {
       try {
@@ -163,50 +163,60 @@ const AdminPage = () => {
           updateData.plan = "free";
           updateData.adsLimit = 10;
           updateData.marketStatus = "restricted";
+        } else {
+          updateData.marketStatus = "active"; // При разбане возвращаем активный статус
         }
 
         // 1. Обновляем статус самого пользователя в базе
         await updateDoc(doc(db, "users", userId), updateData);
 
-        // 2. Если мы забанили пользователя, снимаем его машины с публикации
-        if (willBan) {
-          const batch = writeBatch(db); // Пакетное обновление (работает быстрее и экономит запросы)
-          let hasCarsToUpdate = false;
+        // 2. Обновляем статус всех его машин (false при бане, true при разбане)
+        const batch = writeBatch(db);
+        let hasCarsToUpdate = false;
+        const targetVerifiedStatus = !willBan; // true если разбан, false если бан
 
-          // Попробуем найти машины по email (так как ты используешь car.authorEmail в таблице)
-          if (userEmail) {
-            const qByEmail = query(
-              collection(db, "cars"),
-              where("authorEmail", "==", userEmail),
-            );
-            const snapshotByEmail = await getDocs(qByEmail);
-            snapshotByEmail.forEach((carDoc) => {
-              batch.update(doc(db, "cars", carDoc.id), { verified: false });
-              hasCarsToUpdate = true;
-            });
-          }
-
-          // На всякий случай ищем и по id (если в будущем перейдешь на привязку по authorId)
-          const qById = query(
+        // Поиск по email
+        if (userEmail) {
+          const qByEmail = query(
             collection(db, "cars"),
-            where("authorId", "==", userId),
+            where("authorEmail", "==", userEmail),
           );
-          const snapshotById = await getDocs(qById);
-          snapshotById.forEach((carDoc) => {
-            batch.update(doc(db, "cars", carDoc.id), { verified: false });
+          const snapshotByEmail = await getDocs(qByEmail);
+          snapshotByEmail.forEach((carDoc) => {
+            batch.update(doc(db, "cars", carDoc.id), {
+              verified: targetVerifiedStatus,
+            });
             hasCarsToUpdate = true;
           });
+        }
 
-          // Если машины нашлись, отправляем изменения одним махом
-          if (hasCarsToUpdate) {
-            await batch.commit();
-            console.log(
-              "Все объявления забаненного пользователя успешно скрыты с рынка.",
-            );
-          }
+        // Поиск по id
+        const qById = query(
+          collection(db, "cars"),
+          where("authorId", "==", userId),
+        );
+        const snapshotById = await getDocs(qById);
+        snapshotById.forEach((carDoc) => {
+          batch.update(doc(db, "cars", carDoc.id), {
+            verified: targetVerifiedStatus,
+          });
+          hasCarsToUpdate = true;
+        });
+
+        // Если машины нашлись, отправляем изменения пакетно
+        if (hasCarsToUpdate) {
+          await batch.commit();
+          console.log(
+            willBan
+              ? "Все объявления забаненного пользователя успешно скрыты."
+              : "Все объявления разбаненного пользователя вернулись на рынок.",
+          );
         }
       } catch (e) {
-        console.error("Ошибка при блокировке и скрытии объявлений:", e);
+        console.error(
+          "Ошибка при блокировке/разблокировке и обновлении объявлений:",
+          e,
+        );
       }
     }
   };
