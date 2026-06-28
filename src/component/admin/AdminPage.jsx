@@ -40,7 +40,7 @@ const AdminPage = () => {
 
   // 2. Подписка на пользователей (в реальном времени)
   useEffect(() => {
-    const qUsers = query(collection(db, "users")); // Предполагаем, что коллекция называется "users"
+    const qUsers = query(collection(db, "users"));
     const unsubscribeUsers = onSnapshot(qUsers, (snapshot) => {
       const usersData = [];
       snapshot.forEach((doc) => {
@@ -55,7 +55,6 @@ const AdminPage = () => {
 
   /* ================= ФУНКЦИИ ДЛЯ ОБЪЯВЛЕНИЙ ================= */
 
-  // Одобрение / снятие верификации
   const handleVerify = async (carId, currentStatus) => {
     try {
       const carRef = doc(db, "cars", carId);
@@ -65,7 +64,6 @@ const AdminPage = () => {
     }
   };
 
-  // Переключение VIP-статуса для конкретной машины
   const handleToggleVip = async (carId, currentVipStatus) => {
     try {
       const carRef = doc(db, "cars", carId);
@@ -75,7 +73,6 @@ const AdminPage = () => {
     }
   };
 
-  // Удаление любого объявления
   const handleDeleteCar = async (carId) => {
     if (
       window.confirm(
@@ -109,6 +106,26 @@ const AdminPage = () => {
     }
   };
 
+  // Переключение тарифа: Обычный <-> VIP Аккаунт
+  const handleToggleUserVip = async (userId, currentVipStatus) => {
+    try {
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, { isVip: !currentVipStatus });
+    } catch (error) {
+      console.error("Ошибка при изменении VIP-тарифного плана:", error);
+    }
+  };
+
+  // Изменение статуса аккаунта через выпадающий список (Active, Pending, Restricted)
+  const handleUpdateUserStatus = async (userId, newStatus) => {
+    try {
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, { status: newStatus });
+    } catch (error) {
+      console.error("Ошибка при обновлении статуса пользователя:", error);
+    }
+  };
+
   // Блокировка / Разблокировка пользователя (Бан мошенников)
   const handleToggleBan = async (userId, currentBanStatus) => {
     const actionText = currentBanStatus ? "разблокировать" : "ЗАБЛОКИРОВАТЬ";
@@ -118,15 +135,12 @@ const AdminPage = () => {
       try {
         const userRef = doc(db, "users", userId);
         await updateDoc(userRef, { isBanned: !currentBanStatus });
-
-        // Дополнительно: здесь можно запустить логику удаления всех машин забаненного, если нужно
       } catch (error) {
         console.error("Ошибка при изменении статуса блокировки:", error);
       }
     }
   };
 
-  // Фильтрация машин для рендера
   const filteredCars = cars.filter((car) => {
     if (carFilter === "pending") return !car.verified;
     if (carFilter === "verified") return car.verified;
@@ -144,7 +158,6 @@ const AdminPage = () => {
   return (
     <div className={scss.adminPage}>
       <div className={scss.adminContainer}>
-
         {/* Глобальные переключатели разделов админки */}
         <div className={scss.sectionTabs}>
           <button
@@ -166,7 +179,6 @@ const AdminPage = () => {
         {/* РАЗДЕЛ 1: УПРАВЛЕНИЕ ОБЪЯВЛЕНИЯМИ */}
         {activeSection === "ads" && (
           <>
-            {/* Внутренние фильтры машин */}
             <div className={scss.filterTabs}>
               <button
                 className={carFilter === "all" ? scss.activeTab : ""}
@@ -188,7 +200,6 @@ const AdminPage = () => {
               </button>
             </div>
 
-            {/* Таблица машин */}
             <div className={scss.tableWrapper}>
               <table className={scss.adminTable}>
                 <thead>
@@ -256,14 +267,12 @@ const AdminPage = () => {
                           >
                             {car.verified ? "Снять проверку" : "Одобрить"}
                           </button>
-
                           <button
                             onClick={() => handleToggleVip(car.id, car.isVip)}
                             className={scss.btnVipToggle}
                           >
                             {car.isVip ? "Убрать VIP" : "Дать VIP"}
                           </button>
-
                           <button
                             onClick={() => handleDeleteCar(car.id)}
                             className={scss.btnDelete}
@@ -285,7 +294,7 @@ const AdminPage = () => {
           </>
         )}
 
-        {/* РАЗДЕЛ 2: УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ (БАН / ПРАВА) */}
+        {/* РАЗДЕЛ 2: УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ (ТАРИФЫ, СТАТУСЫ, РОЛИ, БАНЫ) */}
         {activeSection === "users" && (
           <div className={scss.tableWrapper}>
             <table className={scss.adminTable}>
@@ -293,9 +302,10 @@ const AdminPage = () => {
                 <tr>
                   <th>Email пользователя</th>
                   <th>Имя / Никнейм</th>
-                  <th>Текущий статус / Роль</th>
-                  <th>Состояние счета / Активность</th>
-                  <th>Управление правами и баны</th>
+                  <th>Роль доступа</th>
+                  <th>Тарифный план</th>
+                  <th>Статус активности</th>
+                  <th>Управление / Модерация</th>
                 </tr>
               </thead>
               <tbody>
@@ -308,7 +318,7 @@ const AdminPage = () => {
                       <strong
                         style={{ color: user.isBanned ? "#e04554" : "inherit" }}
                       >
-                        {user.email} {user.isBanned && "(ЗАБАНЕН)"}
+                        {user.email} {user.isBanned && " (ЗАБАНЕН)"}
                       </strong>
                     </td>
                     <td>{user.name || user.displayName || "Не указано"}</td>
@@ -320,11 +330,26 @@ const AdminPage = () => {
                       </span>
                     </td>
                     <td>
-                      {user.isVip ? (
-                        <span className={scss.vipCrown}>👑 VIP Аккаунт</span>
-                      ) : (
-                        "Обычный"
-                      )}
+                      <button
+                        onClick={() => handleToggleUserVip(user.id, user.isVip)}
+                        className={`${scss.tariffBadge} ${user.isVip ? scss.vipTariff : scss.baseTariff}`}
+                      >
+                        {user.isVip ? "👑 ТАРИФ: VIP" : "🏷️ ТАРИФ: Базовый"}
+                      </button>
+                    </td>
+                    <td>
+                      <select
+                        value={user.status || "active"}
+                        onChange={(e) =>
+                          handleUpdateUserStatus(user.id, e.target.value)
+                        }
+                        className={scss.statusSelect}
+                        disabled={user.isBanned}
+                      >
+                        <option value="active">🟢 Активен</option>
+                        <option value="pending">🟡 На проверке</option>
+                        <option value="restricted">🔴 Ограничен</option>
+                      </select>
                     </td>
                     <td>
                       <div className={scss.actions}>
@@ -336,7 +361,6 @@ const AdminPage = () => {
                             ? "Сделать участником"
                             : "Дать права админа"}
                         </button>
-
                         <button
                           onClick={() =>
                             handleToggleBan(user.id, user.isBanned)
@@ -345,9 +369,7 @@ const AdminPage = () => {
                             user.isBanned ? scss.btnUnban : scss.btnBan
                           }
                         >
-                          {user.isBanned
-                            ? "Разблокировать"
-                            : "Забанить (Мошенник)"}
+                          {user.isBanned ? "Разблокировать" : "Забанить"}
                         </button>
                       </div>
                     </td>
