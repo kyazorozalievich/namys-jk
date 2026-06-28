@@ -6,6 +6,11 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  query,
+  where,
+  getDocs,
+  writeBatch,
+  increment,
 } from "firebase/firestore";
 import scss from "./AdminPage.module.scss";
 
@@ -60,12 +65,41 @@ const AdminPage = () => {
     }
   };
 
-  const handleDeleteCar = async (carId) => {
-    if (window.confirm("Удалить объявление?")) {
+  const handleDeleteCar = async (car) => {
+    if (window.confirm("Удалить объявление и вернуть пользователю лимит?")) {
       try {
-        await deleteDoc(doc(db, "cars", carId));
+        // 1. Сначала удаляем саму машину из коллекции "cars"
+        await deleteDoc(doc(db, "cars", car.id));
+        console.log("Объявление успешно удалено.");
+
+        // 2. Возвращаем лимит пользователю (уменьшаем adsUsed на 1)
+        // Проверяем, по какому полю мы ищем пользователя: по authorId или по authorEmail
+        if (car.authorId) {
+          // Если в машине сохранен ID автора
+          const userRef = doc(db, "users", car.authorId);
+          await updateDoc(userRef, {
+            adsUsed: increment(-1), // Уменьшаем на 1
+          });
+          console.log("Лимит пользователя успешно возвращен (по ID).");
+        } else if (car.authorEmail) {
+          // Если ID нет, но есть email (ищем пользователя по email)
+          const userQuery = query(
+            collection(db, "users"),
+            where("email", "==", car.authorEmail),
+          );
+          const userSnapshot = await getDocs(userQuery);
+
+          if (!userSnapshot.empty) {
+            const userDoc = userSnapshot.docs[0];
+            const userRef = doc(db, "users", userDoc.id);
+            await updateDoc(userRef, {
+              adsUsed: increment(-1), // Уменьшаем на 1
+            });
+            console.log("Лимит пользователя успешно возвращен (по Email).");
+          }
+        }
       } catch (e) {
-        console.error(e);
+        console.error("Ошибка при удалении машины или обновлении лимита:", e);
       }
     }
   };
@@ -108,33 +142,71 @@ const AdminPage = () => {
     }
   };
 
-  // Бан пользователя + обнуление VIP и статуса активности
-  const handleToggleBan = async (userId, currentBanStatus) => {
-    const willBan = !currentBanStatus; // true, если мы баним пользователя
+  // Бан пользователя + сброс VIP + отключение его машин с рынка
+  const handleToggleBan = async (user) => {
+    const userId = user.id;
+    const userEmail = user.email;
+    const currentBanStatus = user.isBanned;
+    const willBan = !currentBanStatus;
 
     if (
       window.confirm(
         willBan
-          ? "ЗАБЛОКИРОВАТЬ пользователя и сбросить его VIP-статус?"
-          : "Разблокировать?",
+          ? "ЗАБЛОКИРОВАТЬ пользователя, сбросить его тариф и снять с рынка ВСЕ его машины?"
+          : "Разблокировать пользователя?",
       )
     ) {
       try {
-        // Создаем базовый объект для обновления бана
-        const updateData = {
-          isBanned: willBan,
-        };
+        const updateData = { isBanned: willBan };
 
-        // Если мы именно БАНИМ, то дописываем сброс VIP и смену статуса активности
         if (willBan) {
           updateData.plan = "free";
-          updateData.adsLimit = 10; // Твой базовый лимит для обычного юзера
-          updateData.marketStatus = "restricted"; // Меняем доступ к рынку на ограниченный/бан
+          updateData.adsLimit = 10;
+          updateData.marketStatus = "restricted";
         }
 
+        // 1. Обновляем статус самого пользователя в базе
         await updateDoc(doc(db, "users", userId), updateData);
+
+        // 2. Если мы забанили пользователя, снимаем его машины с публикации
+        if (willBan) {
+          const batch = writeBatch(db); // Пакетное обновление (работает быстрее и экономит запросы)
+          let hasCarsToUpdate = false;
+
+          // Попробуем найти машины по email (так как ты используешь car.authorEmail в таблице)
+          if (userEmail) {
+            const qByEmail = query(
+              collection(db, "cars"),
+              where("authorEmail", "==", userEmail),
+            );
+            const snapshotByEmail = await getDocs(qByEmail);
+            snapshotByEmail.forEach((carDoc) => {
+              batch.update(doc(db, "cars", carDoc.id), { verified: false });
+              hasCarsToUpdate = true;
+            });
+          }
+
+          // На всякий случай ищем и по id (если в будущем перейдешь на привязку по authorId)
+          const qById = query(
+            collection(db, "cars"),
+            where("authorId", "==", userId),
+          );
+          const snapshotById = await getDocs(qById);
+          snapshotById.forEach((carDoc) => {
+            batch.update(doc(db, "cars", carDoc.id), { verified: false });
+            hasCarsToUpdate = true;
+          });
+
+          // Если машины нашлись, отправляем изменения одним махом
+          if (hasCarsToUpdate) {
+            await batch.commit();
+            console.log(
+              "Все объявления забаненного пользователя успешно скрыты с рынка.",
+            );
+          }
+        }
       } catch (e) {
-        console.error("Ошибка при изменении статуса блокировки:", e);
+        console.error("Ошибка при блокировке и скрытии объявлений:", e);
       }
     }
   };
@@ -237,7 +309,7 @@ const AdminPage = () => {
                             {car.isVip ? "Убрать VIP" : "Дать VIP"}
                           </button>
                           <button
-                            onClick={() => handleDeleteCar(car.id)}
+                            onClick={() => handleDeleteCar(car)}
                             className={scss.btnDelete}
                           >
                             Удалить
@@ -337,9 +409,7 @@ const AdminPage = () => {
                           Роль
                         </button>
                         <button
-                          onClick={() =>
-                            handleToggleBan(user.id, user.isBanned)
-                          }
+                          onClick={() => handleToggleBan(user)}
                           className={
                             user.isBanned ? scss.btnUnban : scss.btnBan
                           }
