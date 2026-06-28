@@ -1,7 +1,7 @@
 import React from "react";
 import scss from "./Footer.module.scss";
 import fullogo from "../../../data/images/fullogo.png";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const Footer = () => {
   return (
