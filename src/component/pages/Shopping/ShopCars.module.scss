@@ -21,6 +21,7 @@
       justify-content: space-between;
       width: 100%;
       margin-block: 10px;
+
       .tables {
         display: flex;
         gap: 20px;
@@ -30,13 +31,19 @@
           height: 38px;
           border-radius: 5px;
           border: 1px solid #c89b45;
-          background: white;
           padding: 0 10px;
           outline: none;
           background: transparent;
+          color: inherit; 
           cursor: pointer;
+
+          option {
+            background: #1a1a1a; 
+            color: white;
+          }
         }
       }
+
       button {
         width: 200px;
         height: 40px;
@@ -58,84 +65,18 @@
       gap: 25px;
       flex-wrap: wrap;
     }
-
-    .card {
-      width: 240px;
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-      transition: 0.3s;
-      &:hover {
-        transform: translateY(-8px);
-      }
-      .cardImg {
-        height: 160px;
-        position: relative;
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-        .type {
-          position: absolute;
-          top: 12px;
-          right: 12px;
-          background: #b68a3d;
-          color: white;
-          padding: 5px 12px;
-          border-radius: 20px;
-          font-size: 12px;
-        }
-      }
-
-      .cardInfo {
-        padding: 15px;
-        h3 {
-          font-size: 15px;
-          margin-bottom: 8px;
-          font-weight: 500;
-        }
-        .description {
-          font-size: 12px;
-          color: #777;
-          height: 35px;
-        }
-        .bottom {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          h2 {
-            color: #b68a3d;
-            font-size: 12px;
-            font-weight: 500;
-            span {
-              color: #777;
-            }
-          }
-
-          button {
-            width: 100px;
-            height: 30px;
-            border: none;
-            border-radius: 5px;
-            background: #b68a3d;
-            color: white;
-            cursor: pointer;
-          }
-        }
-      }
-    }
   }
 
+  /* --- МОДАЛЬНОЕ ОКНО --- */
   .modalBg {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.65); 
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 99;
+    backdrop-filter: blur(4px); 
   }
 
   .modal {
@@ -148,25 +89,36 @@
     align-items: center;
     text-align: center;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
     z-index: 100;
     position: relative;
+    color: #111; 
+
     .close {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 20px;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
       cursor: pointer;
+      color: #777;
+      transition: 0.2s;
+      &:hover {
+        color: #000;
+      }
     }
+
     .modalImg {
       display: flex;
       align-items: center;
       gap: 15px;
+      position: relative;
+
       img {
         width: 380px;
         height: 230px;
         object-fit: cover;
-        border-radius: 18px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
       }
 
       button {
@@ -177,16 +129,28 @@
         height: 35px;
         border-radius: 50%;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+        &:hover {
+          background: #c79a4d;
+          transform: scale(1.05);
+        }
       }
     }
 
     h2 {
-      font-size: 20px;
+      font-size: 22px;
+      margin: 0;
+      font-weight: 600;
     }
 
     p {
       color: #555;
-      font-size: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 90%;
     }
 
     .detail {
@@ -194,25 +158,94 @@
       display: flex;
       align-items: center;
       justify-content: space-around;
-      height: 40px;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+      padding-block: 10px;
+      margin-block: 5px;
+
       h4 {
         font-weight: 500;
         font-size: 15px;
+        margin: 0;
         span {
           color: #b68a3d;
+          font-weight: 700;
         }
       }
     }
 
     .buy {
-      margin-top: 15px;
+      margin-top: 10px;
       width: 100%;
-      height: 40px;
+      height: 42px;
       background: #b68a3d;
       border: none;
-      border-radius: 12px;
+      border-radius: 8px;
       color: white;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: 0.2s;
+      &:hover {
+        background: #c79a4d;
+      }
+    }
+
+    /* --- СТИЛИ КНОПОК СОЦ. СЕТЕЙ ДЛЯ СВЯЗИ --- */
+    .contactBtn {
+      margin-top: 10px;
+      width: 100%;
+      height: 44px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+      svg {
+        font-size: 20px;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        filter: brightness(1.1);
+      }
+
+      /* Telegram Стили */
+      &.telegram {
+        background: #229ed9;
+      }
+
+      /* WhatsApp Стили */
+      &.whatsapp {
+        background: #25d366;
+      }
+
+      /* Instagram Стили */
+      &.instagram {
+        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      }
+
+      /* TikTok Стили */
+      &.tiktok {
+        background: #010101;
+        border: 1px solid #fe2c55;
+      }
+
+      /* Email Стили */
+      &.email {
+        background: #ea4335;
+      }
     }
   }
 }

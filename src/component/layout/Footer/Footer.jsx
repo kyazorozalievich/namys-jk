@@ -1,9 +1,10 @@
 import React from "react";
 import scss from "./Footer.module.scss";
 import fullogo from "../../../data/images/fullogo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
   return (
     <footer>
       <div className="container">
@@ -18,10 +19,10 @@ const Footer = () => {
             </div>
             <div className={scss.navigationBlock}>
               <h3>Навигация</h3>
-              <Link>Главная</Link>
-              <Link>О Клане</Link>
-              <Link>Рынок</Link>
-              <Link>Мастерская</Link>
+              <Link to='/'>Главная</Link>
+              <Link to='/about'>О Клане</Link>
+              <Link to='/detailing'>Мастерская</Link>
+              <Link to='/'>Авторынок</Link>
             </div>
             <div className={scss.contactBlock}>
               <h3>Контакты</h3>

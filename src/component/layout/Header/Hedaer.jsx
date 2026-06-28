@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import scss from "./Header.module.scss";
-import logo from "../../../data/images/fullogo.png";
+import logo  from "../../../data/images/fullogo.png";
 
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
@@ -22,10 +22,13 @@ const Header = () => {
   const location = useLocation();
   const { checkMarketAccess } = useContext(ModalContext);
   const navigate = useNavigate();
-  const { profile } = useUserProfile();
-
+  
+  // Достаем profile (где хранится роль из Firestore)
+  const { profile } = useUserProfile(); 
   const { user } = useContext(AuthContext);
-  console.log("HEADER:", user);
+  
+  console.log("HEADER AUTH USER:", user);
+  console.log("HEADER FIRESTORE PROFILE:", profile);
 
   const [openProfile, setOpenProfile] = useState(false);
 
@@ -39,8 +42,18 @@ const Header = () => {
 
   const logout = async () => {
     await signOut(auth);
-
     setOpenProfile(false);
+  };
+
+  const handleAdminClick = () => {
+    // Проверяем роль именно из Firestore профиля
+    if (profile && profile.role === "admin") {
+      navigate("/admin");
+    } else {
+      alert(
+        "Доступ запрещен. Эта панель только для Администрации клана NAMYS JK.",
+      );
+    }
   };
 
   return (
@@ -83,7 +96,13 @@ const Header = () => {
           </div>
 
           <div className={scss.icons}>
-            <MdAdminPanelSettings className={scss.admin} />
+            {/* Иконка проверяет роль из Firestore документа */}
+            {profile && profile.role === "admin" && (
+              <MdAdminPanelSettings
+                className={scss.admin}
+                onClick={handleAdminClick}
+              />
+            )}
 
             {user ? (
               <div
@@ -94,7 +113,6 @@ const Header = () => {
 
                 <div className={scss.info}>
                   <h4>{user.displayName}</h4>
-
                   <p>Онлайн</p>
                 </div>
 
@@ -115,7 +133,6 @@ const Header = () => {
             ) : (
               <button className={scss.login} onClick={loginWithGoogle}>
                 <FaUser />
-
                 <span>Войти</span>
               </button>
             )}

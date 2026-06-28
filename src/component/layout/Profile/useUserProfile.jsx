@@ -51,6 +51,6 @@ export const useUserProfile = () => {
 
   return {
     profile,
-    loading,
+    loading
   };
 };

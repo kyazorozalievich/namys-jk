@@ -1,0 +1,375 @@
+.create {
+  width: 100%;
+  padding: 120px 0 80px; /* Сделали отступ сверху больше, как в .profilePage */
+  background: #f7f7f7; /* Мягкий светлый фон вместо черного */
+  min-height: 100vh;
+}
+
+.title {
+  margin-bottom: 35px;
+
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #111; /* Темный текст вместо белого */
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 12px;
+
+    svg {
+      color: #d1a959; /* Благородное золото */
+    }
+  }
+
+  p {
+    color: #777; /* Мягкий серый цвет для описания */
+    font-size: 16px;
+  }
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.left,
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Карточки стали белыми, с мягкой тенью и без агрессивных рамок */
+.card,
+.profile,
+.rules {
+  background: white;
+  border: 1px solid #ececec;
+  border-radius: 20px; /* Округление 20px, как во втором коде */
+  padding: 35px; /* Сделали внутренние отступы просторнее */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+  transition: 0.3s; /* Перенес транзишн сюда для чистоты */
+
+  &:hover {
+    border-color: #d1a959;
+    transform: translateY(-2px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.card h2,
+.profile h2,
+.rules h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #111; /* Темный заголовок */
+  font-size: 23px;
+  margin-bottom: 25px;
+
+  svg {
+    color: #d1a959; /* Золотой акцент */
+  }
+}
+
+.photos {
+  display: flex;
+  gap: 18px;
+}
+
+/* Зона загрузки фото стала аккуратной и светлой */
+.photo {
+  flex: 1;
+  height: 210px;
+  border: 2px dashed #ececec;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+  background: #fafafa;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    border-color: #d1a959;
+    background: rgba(209, 169, 89, 0.05);
+  }
+
+  span {
+    color: #d1a959;
+    font-size: 60px;
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  p {
+    margin-top: 15px;
+    color: #555; /* Темный текст вместо белого */
+    font-size: 15px;
+  }
+}
+
+.inputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.inputBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    color: #333; /* Более читаемый темный лейбл */
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  input,
+  select {
+    width: 100%;
+    height: 52px;
+    border-radius: 12px;
+    border: 1px solid #ececec;
+    background: #fafafa; /* Светлая подложка для инпутов, как .item во втором коде */
+    color: #111; /* Черный текст при вводе */
+    padding: 0 15px;
+    outline: none;
+    transition: 0.25s;
+    font-size: 15px;
+
+    &:focus {
+      border-color: #d1a959;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(209, 169, 89, 0.15);
+    }
+  }
+
+  select {
+    cursor: pointer;
+  }
+}
+
+.description {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  label {
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+
+    svg {
+      color: #d1a959;
+      font-size: 20px;
+    }
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 170px;
+    resize: vertical;
+    border-radius: 12px;
+    border: 1px solid #ececec;
+    background: #fafafa;
+    color: #111;
+    padding: 15px;
+    outline: none;
+    transition: 0.25s;
+    font-size: 15px;
+
+    &:focus {
+      border-color: #d1a959;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(209, 169, 89, 0.15);
+    }
+
+    &::placeholder {
+      color: #aaa;
+    }
+  }
+}
+
+/* Блок информации в профиле (светлые разделители) */
+.info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #ececec;
+  }
+
+  svg {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(209, 169, 89, 0.1); /* Нежно-золотой фон под иконку */
+    color: #d1a959;
+  }
+
+  span {
+    display: block;
+    color: gray; /* Как во втором коде */
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    color: #111;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+.rules {
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-left: 18px;
+  }
+
+  li {
+    color: #555; /* Мягкий темный цвет для текста правил */
+    line-height: 1.6;
+    font-size: 15px;
+  }
+}
+
+/* Главная кнопка действия (стиль .addCar) */
+.right {
+  button {
+    width: 100%;
+    height: 58px;
+    border: none;
+    border-radius: 14px;
+    background: #d1a959; /* Золото из второго примера */
+    color: white; /* Белый текст вместо черного */
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 8px 25px rgba(209, 169, 89, 0.25);
+
+    &:hover {
+      background: #b68a3d; /* При ховере темнеет, как .addCar */
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(182, 138, 61, 0.35);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+/* Скроллбар в едином стиле */
+textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: #d1a959;
+  border-radius: 20px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: #fafafa;
+}
+
+select option {
+  background: white; /* Выпадающий список теперь тоже белый */
+  color: #111;
+}
+
+/* Планшет */
+@media (max-width: 1000px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .right {
+    order: -1;
+  }
+}
+
+/* Телефон */
+@media (max-width: 700px) {
+  .title {
+    h1 {
+      font-size: 30px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .photos {
+    flex-direction: column;
+  }
+
+  .photo {
+    width: 100%;
+    height: 180px;
+  }
+
+  .card,
+  .profile,
+  .rules {
+    padding: 25px; /* Чуть больше отступов даже на мобилке для ощущения премиальности */
+  }
+
+  .card h2,
+  .profile h2,
+  .rules h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  .create {
+    padding: 40px 0 60px;
+  }
+
+  .title {
+    h1 {
+      font-size: 24px;
+    }
+  }
+
+  .info {
+    svg {
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+    }
+
+    p {
+      font-size: 15px;
+    }
+  }
+
+  .right button {
+    height: 54px;
+    font-size: 16px;
+  }
+}

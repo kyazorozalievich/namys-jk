@@ -1,0 +1,309 @@
+.adminPage {
+  padding: 120px 40px 60px; // Отступы по бокам, чтобы контент не прилипал к краям экрана
+  background: #f7f7f7; // Твой фирменный светлый фон
+  font-family: sans-serif;
+}
+
+.adminContainer {
+  width: 100%;
+  margin: 0 auto;
+  color: #333;
+}
+
+.filterTabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+
+  button {
+    background: white; // Кнопки теперь чисто белые на сером фоне страницы
+    border: 1px solid #ececec;
+    color: gray;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #ececec;
+      color: #111;
+    }
+
+    &.activeTab {
+      background: #d1a959; // Активный золотой таб
+      color: white;
+      font-weight: 700;
+      border-color: #d1a959;
+    }
+  }
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ececec;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); // Совсем легкая, незаметная тень
+}
+
+.adminTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  th,
+  td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #ececec;
+    vertical-align: middle;
+  }
+
+  th {
+    background: #fafafa;
+    color: gray;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+  }
+
+  tr.vipRow {
+    background: rgba(
+      209,
+      169,
+      89,
+      0.04
+    ); // Едва уловимый золотой тон для VIP строк
+  }
+
+  .carThumb {
+    width: 64px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #fafafa;
+    border: 1px solid #ececec;
+  }
+
+  .carInfo {
+    display: flex;
+    flex-direction: column;
+
+    strong {
+      color: #111;
+      font-size: 15px;
+    }
+    span {
+      color: #d1a959; // Цена золотая
+      font-weight: 700;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+  }
+
+  .authorInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+    color: #555;
+
+    .roleBadge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      width: max-content;
+      font-weight: 700;
+    }
+
+    .admin {
+      background: #111;
+      color: #fff;
+    }
+    .member {
+      background: #ececec;
+      color: gray;
+    }
+  }
+
+  .specs {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 14px;
+    color: #555;
+
+    .vipCrown {
+      color: #d1a959;
+      font-weight: 700;
+      font-size: 12px;
+    }
+  }
+
+  .statusBadge {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px; // Мягкие округлые баджи
+    font-weight: 700;
+    display: inline-block;
+
+    &.verified {
+      background: rgba(4, 213, 97, 0.1);
+      color: #04b350;
+    }
+    &.pending {
+      background: rgba(209, 169, 89, 0.12);
+      color: #b68a3d;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+
+    button {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+
+    .btnVerify {
+      background: #d1a959; // Золотая кнопка
+      color: white;
+    }
+
+    .btnUnverify {
+      background: #ececec;
+      color: #333;
+    }
+
+    .btnDelete {
+      background: #fde8e9; // Пастельный красный, не режет глаза
+      color: #e04554;
+    }
+  }
+}
+
+.emptyState {
+  padding: 40px;
+  text-align: center;
+  color: gray;
+  font-size: 15px;
+}
+
+.loader {
+  text-align: center;
+  padding: 60px;
+  color: #d1a959;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+// Планшеты и мобилки
+@media (max-width: 768px) {
+  .adminPage {
+    padding: 100px 15px 40px;
+  }
+
+  .adminHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+// Глобальные табы разделов (Объявления / Пользователи)
+.sectionTabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+
+  button {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: gray;
+    padding: 10px 5px;
+    cursor: pointer;
+    transition: color 0.2s;
+    position: relative;
+
+    &:hover {
+      color: #111;
+    }
+
+    &.activeSectionTab {
+      color: #d1a959; // Твой золотой цвет
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -12px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: #d1a959;
+        border-radius: 2px;
+      }
+    }
+  }
+}
+
+.separator {
+  border: none;
+  height: 1px;
+  background: #ececec;
+  margin: 0 0 25px 0;
+}
+
+// Новые специфические кнопки действий
+.btnVipToggle {
+  background: rgba(209, 169, 89, 0.15);
+  color: #b68a3d;
+  &:hover {
+    background: #d1a959 !important;
+    color: white !important;
+  }
+}
+
+.btnRoleToggle {
+  background: #ececec;
+  color: #333;
+  &:hover {
+    background: #111 !important;
+    color: #fff !important;
+  }
+}
+
+.btnBan {
+  background: #fde8e9;
+  color: #e04554;
+  &:hover {
+    background: #e04554 !important;
+    color: white !important;
+  }
+}
+
+.btnUnban {
+  background: rgba(4, 213, 97, 0.15);
+  color: #04b350;
+  &:hover {
+    background: #04b350 !important;
+    color: white !important;
+  }
+}
+
+// Подсветка заблокированной строки пользователя
+tr.bannedRow {
+  background: rgba(224, 69, 84, 0.03) !important;
+}

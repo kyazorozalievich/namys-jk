@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import scss from "./ProfileMenu.module.scss";
 import { useUserProfile } from "./useUserProfile";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { ModalContext } from "../../../ui/ModalContext";
 
 const ProfileMenu = () => {
@@ -17,6 +16,10 @@ const ProfileMenu = () => {
   if (!profile) {
     return <h2 className={scss.errorAuth}>Профиль не найден</h2>;
   }
+
+  // Настройка лимитов на основе общего поля plan
+  const adsLimit = profile.plan === "vip" ? 20 : 10;
+  const adsUsed = profile.adsUsed || 0;
 
   return (
     <section className={scss.profilePage}>
@@ -43,7 +46,7 @@ const ProfileMenu = () => {
           <div className={scss.stats}>
             <div className={scss.item}>
               <span>Роль</span>
-              <h3>{profile.role}</h3>
+              <h3>{profile.role || "member"}</h3>
             </div>
 
             <div className={scss.item}>
@@ -65,7 +68,7 @@ const ProfileMenu = () => {
             <div className={scss.item}>
               <span>Объявления</span>
               <h3>
-                {profile.adsUsed}/{profile.adsLimit}
+                {adsUsed}/{adsLimit}
               </h3>
             </div>
           </div>
@@ -73,13 +76,13 @@ const ProfileMenu = () => {
           <div className={scss.progress}>
             <div
               style={{
-                width: `${(profile.adsUsed / profile.adsLimit) * 100}%`,
+                width: `${Math.min((adsUsed / adsLimit) * 100, 100)}%`,
               }}
             ></div>
           </div>
 
           <p className={scss.bottomText}>
-            Свободно мест: <b>{profile.adsLimit - profile.adsUsed}</b>
+            Свободно мест: <b>{Math.max(adsLimit - adsUsed, 0)}</b>
           </p>
 
           <div className={scss.actions}>
@@ -104,16 +107,14 @@ const ProfileMenu = () => {
             {profile.marketStatus === "active" ? (
               <>
                 <p>✅ У вас есть доступ к публикации автомобилей.</p>
-
                 <p>
                   Вы можете разместить еще{" "}
-                  <b>{profile.adsLimit - profile.adsUsed}</b> объявлений.
+                  <b>{Math.max(adsLimit - adsUsed, 0)}</b> объявлений.
                 </p>
               </>
             ) : (
               <>
                 <p>🔒 Доступ к публикации автомобилей отсутствует.</p>
-
                 <p>Для получения доступа обратитесь к администрации клана.</p>
 
                 <button
