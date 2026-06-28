@@ -5,18 +5,12 @@ import {
   FaCar,
   FaGoogle,
   FaImage,
-  FaTelegramPlane,
-  FaWhatsapp,
-  FaInstagram,
-  FaTiktok,
 } from "react-icons/fa";
 import {
   MdOutlineDescription,
   MdVerified,
-  MdEmail,
-  MdContactPage,
+
 } from "react-icons/md"; // Заменил на Md для консистентности, если MdContactPage нет, можно использовать любую
-import { MdContactPhone } from "react-icons/md";
 
 // Импорты Firebase
 import { db, storage, auth } from "../../../firebase/FireBase";
