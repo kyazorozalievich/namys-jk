@@ -108,17 +108,33 @@ const AdminPage = () => {
     }
   };
 
-  // Бан пользователя
+  // Бан пользователя + обнуление VIP и статуса активности
   const handleToggleBan = async (userId, currentBanStatus) => {
+    const willBan = !currentBanStatus; // true, если мы баним пользователя
+
     if (
-      window.confirm(currentBanStatus ? "Разблокировать?" : "ЗАБЛОКИРОВАТЬ?")
+      window.confirm(
+        willBan
+          ? "ЗАБЛОКИРОВАТЬ пользователя и сбросить его VIP-статус?"
+          : "Разблокировать?",
+      )
     ) {
       try {
-        await updateDoc(doc(db, "users", userId), {
-          isBanned: !currentBanStatus,
-        });
+        // Создаем базовый объект для обновления бана
+        const updateData = {
+          isBanned: willBan,
+        };
+
+        // Если мы именно БАНИМ, то дописываем сброс VIP и смену статуса активности
+        if (willBan) {
+          updateData.plan = "free";
+          updateData.adsLimit = 10; // Твой базовый лимит для обычного юзера
+          updateData.marketStatus = "restricted"; // Меняем доступ к рынку на ограниченный/бан
+        }
+
+        await updateDoc(doc(db, "users", userId), updateData);
       } catch (e) {
-        console.error(e);
+        console.error("Ошибка при изменении статуса блокировки:", e);
       }
     }
   };
